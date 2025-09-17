@@ -1,0 +1,62 @@
+// Prisma 数据模型定义
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户模型
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(50)
+  email        String   @unique @db.VarChar(100)
+  passwordHash String   @db.VarChar(255)
+  nickname     String?  @db.VarChar(50)
+  avatar       String?  @db.VarChar(255)
+  role         String   @default("user") // 可选值: user, admin, superadmin
+  status       String   @default("active") // 可选值: active, inactive, blocked
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastLoginAt  DateTime?
+  disabledRemark String? @db.Text // 禁用备注
+  
+  // 用户来源标识
+  source       String?  @db.VarChar(50) // 记录用户注册来源，如 'web-app', 'admin-app', 'mobile-app' 等
+  
+  // 用户使用的产品列表
+  products     Json?    // 存储用户使用的产品信息，格式如: [{id: 'product1', name: '产品1', joinedAt: '2023-01-01'}]
+  
+  // 反向关系
+  sessions     UserSession[]
+  loginLogs    UserLoginLog[]
+}
+
+// 用户会话模型
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @db.VarChar(500)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  ipAddress String?  @db.VarChar(50)
+  userAgent String?  @db.VarChar(255)
+  deviceId  String?  @db.VarChar(100)
+}
+
+// 用户登录日志模型
+model UserLoginLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
+  username  String?  @db.VarChar(50)
+  ipAddress String   @db.VarChar(50)
+  userAgent String?  @db.VarChar(255)
+  success   Boolean
+  message   String?  @db.Text
+  createdAt DateTime @default(now())
+}
