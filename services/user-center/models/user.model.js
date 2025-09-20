@@ -29,10 +29,16 @@ class UserModel {
 
       if (existingUser) {
         if (existingUser.username === userData.username) {
-          throw new Error('用户名已存在');
+          return {
+            code: 400,
+            message: '用户名已存在'
+          }
         }
         if (existingUser.email === userData.email) {
-          throw new Error('邮箱已被注册');
+          return {
+            code: 400,
+            message: '邮箱已被注册'
+          }
         }
       }
 
@@ -63,7 +69,7 @@ class UserModel {
         }
       });
 
-      return user;
+      return { code: 200, message: '创建用户成功', data: user };
     } catch (error) {
       throw error;
     }
@@ -90,19 +96,28 @@ class UserModel {
 
       if (!user) {
         await this.saveLoginLog(null, username, loginInfo, false, '用户不存在');
-        throw new Error('用户名或密码错误');
+        return {
+          code: 400,
+          message: '用户不存在'
+        }
       }
 
       if (user.status !== 'active') {
         await this.saveLoginLog(user.id, username, loginInfo, false, '用户已被禁用');
-        throw new Error('用户已被禁用');
+        return {
+          code: 400,
+          message: '用户已被禁用'
+        }
       }
 
       // 验证密码
       const isMatch = await bcrypt.compare(password, user.passwordHash);
       if (!isMatch) {
         await this.saveLoginLog(user.id, username, loginInfo, false, '密码错误');
-        throw new Error('用户名或密码错误');
+        return {
+          code: 400,
+          message: '用户名或密码错误'
+        }
       }
 
       // 生成JWT令牌
@@ -149,7 +164,7 @@ class UserModel {
         status: user.status
       };
 
-      return { user: userInfo, token };
+      return { code: 200, message: '登录成功', data: { user: userInfo, token } };
     } catch (error) {
       throw error;
     }
@@ -182,10 +197,13 @@ class UserModel {
       });
 
       if (!user) {
-        throw new Error('用户不存在');
+        return {
+          code: 400,
+          message: '用户不存在'
+        }
       }
 
-      return user;
+      return { code: 200, message: '获取用户信息成功', data: user };
     } catch (error) {
       throw error;
     }
@@ -223,10 +241,16 @@ class UserModel {
 
         if (existingUser) {
           if (existingUser.username === data.username) {
-            throw new Error('用户名已存在');
+            return {
+              code: 400,
+              message: '用户名已存在'
+            }
           }
           if (existingUser.email === data.email) {
-            throw new Error('邮箱已被注册');
+            return {
+              code: 400,
+              message: '邮箱已被注册'
+            }
           }
         }
       }
@@ -250,7 +274,7 @@ class UserModel {
         }
       });
 
-      return user;
+      return { code: 200, message: '更新用户信息成功', data: user };
     } catch (error) {
       throw error;
     }
@@ -269,7 +293,10 @@ class UserModel {
       });
 
       if (!user) {
-        throw new Error('用户不存在');
+        return {
+          code: 400,
+          message: '用户不存在'
+        }
       }
 
       // 事务处理：删除用户及其相关数据
@@ -288,7 +315,7 @@ class UserModel {
         })
       ]);
 
-      return user;
+      return { code: 200, message: '删除用户成功', data: user };
     } catch (error) {
       throw error;
     }
@@ -352,7 +379,7 @@ class UserModel {
         prisma.user.count({ where: where })
       ]);
 
-      return { users, total };
+      return { code: 200, message: '获取用户列表成功', data: { users, total } };
     } catch (error) {
       throw error;
     }
@@ -377,10 +404,16 @@ class UserModel {
 
       if (existingUser) {
         if (existingUser.username === userData.username) {
-          throw new Error('用户名已存在');
+          return {
+            code: 400,
+            message: '用户名已存在'
+          }
         }
         if (existingUser.email === userData.email) {
-          throw new Error('邮箱已被注册');
+          return {
+            code: 400,
+            message: '邮箱已被注册'
+          }
         }
       }
 
@@ -413,7 +446,11 @@ class UserModel {
         }
       });
 
-      return user;
+      return {
+        code: 200,
+        message: '创建用户成功',
+        data: user
+      };
     } catch (error) {
       throw error;
     }
@@ -490,7 +527,10 @@ class UserModel {
       });
 
       if (!user) {
-        throw new Error('用户不存在');
+        return {
+          code: 400,
+          message: '用户不存在'
+        }
       }
 
       // 初始化产品列表（如果不存在）
@@ -502,7 +542,10 @@ class UserModel {
       // 检查产品是否已存在
       const existingProductIndex = products.findIndex(p => p.id === productInfo.id);
       if (existingProductIndex >= 0) {
-        throw new Error('产品已关联');
+        return {
+          code: 400,
+          message: '产品已关联'
+        }
       }
 
       // 添加新的产品关联
@@ -523,7 +566,7 @@ class UserModel {
         }
       });
 
-      return updatedUser;
+      return { code: 200, message: '添加用户产品关联成功', data: updatedUser };
     } catch (error) {
       throw error;
     }
@@ -544,7 +587,10 @@ class UserModel {
       });
 
       if (!user) {
-        throw new Error('用户不存在');
+        return {
+          code: 400,
+          message: '用户不存在'
+        }
       }
 
       // 初始化产品列表（如果不存在）
@@ -556,7 +602,10 @@ class UserModel {
       // 过滤掉要移除的产品
       const filteredProducts = products.filter(p => p.id !== productId);
       if (filteredProducts.length === products.length) {
-        throw new Error('产品关联不存在');
+        return {
+          code: 400,
+          message: '产品关联不存在'
+        }
       }
 
       // 更新用户产品列表
@@ -570,7 +619,7 @@ class UserModel {
         }
       });
 
-      return updatedUser;
+      return { code: 200, message: '移除用户产品关联成功', data: updatedUser };
     } catch (error) {
       throw error;
     }

@@ -151,7 +151,7 @@ router.get('/', authJWT, authorizeRoles('admin', 'superadmin'), async (req, res)
  *                 type: string
  *                 description: 禁用备注（仅在status为blocked时有效）
  *     responses:
- *       201: 
+ *       200: 
  *         description: 创建成功
  *         content:
  *           application/json:
@@ -177,14 +177,14 @@ router.post('/', authJWT, authorizeRoles('admin', 'superadmin'), async (req, res
     
     // 验证参数
     if (!username || !email || !password) {
-      return res.status(400).json({
+      return res.status(200).json({
         code: 400,
         message: '请提供用户名、邮箱和密码'
       });
     }
     
     if (password.length < 6) {
-      return res.status(400).json({
+      return res.status(200).json({
         code: 400,
         message: '密码长度不能少于6位'
       });
@@ -202,13 +202,9 @@ router.post('/', authJWT, authorizeRoles('admin', 'superadmin'), async (req, res
     
     const user = await UserModel.adminCreateUser(userData);
     
-    res.status(201).json({
-      code: 201,
-      message: '创建成功',
-      data: user
-    });
+    res.status(200).json(user);
   } catch (error) {
-    res.status(400).json({
+    res.status(200).json({
       code: 400,
       message: error.message || '创建用户失败'
     });

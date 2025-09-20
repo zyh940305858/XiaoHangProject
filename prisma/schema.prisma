@@ -18,9 +18,9 @@ model User {
   nickname     String?  @db.VarChar(50)
   avatar       String?  @db.VarChar(255)
   role         String   @default("user") // 可选值: user, admin, superadmin
-  status       String   @default("active") // 可选值: active, inactive, blocked
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  status       String   @default("active") // 可选值: active, disabled
+  createdAt    DateTime @default(now()) // 在应用程序层面转换为时间戳
+  updatedAt    DateTime @updatedAt // 在应用程序层面转换为时间戳
   lastLoginAt  DateTime?
   disabledRemark String? @db.Text // 禁用备注
   
@@ -42,7 +42,7 @@ model UserSession {
   user      User     @relation(fields: [userId], references: [id])
   token     String   @db.VarChar(500)
   expiresAt DateTime
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) // 在应用程序层面转换为时间戳
   ipAddress String?  @db.VarChar(50)
   userAgent String?  @db.VarChar(255)
   deviceId  String?  @db.VarChar(100)
@@ -58,5 +58,5 @@ model UserLoginLog {
   userAgent String?  @db.VarChar(255)
   success   Boolean
   message   String?  @db.Text
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) // 在应用程序层面转换为时间戳
 }
