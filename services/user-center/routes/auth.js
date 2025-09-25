@@ -98,16 +98,9 @@ router.post('/register', async (req, res) => {
       source
     });
 
-    res.status(201).json({
-      code: 201,
-      message: '注册成功',
-      data: user
-    });
+    res.status(201).json(user);
   } catch (error) {
-    res.status(400).json({
-      code: 400,
-      message: error.message || '注册失败'
-    });
+    res.status(400).json(user);
   }
 });
 
@@ -185,11 +178,7 @@ router.post('/login', async (req, res) => {
     // 用户登录
     const result = await UserModel.login(username, password, loginInfo);
 
-    res.status(200).json({
-      code: 200,
-      message: '登录成功',
-      data: result
-    });
+    res.status(200).json(result);
   } catch (error) {
     res.status(200).json({
       code: 401,
@@ -335,11 +324,7 @@ router.get('/me', authJWT, async (req, res) => {
     // 获取当前用户详细信息
     const userInfo = await UserModel.getUserInfo(req.user.id);
 
-    res.status(200).json({
-      code: 200,
-      message: '获取成功',
-      data: userInfo
-    });
+    res.status(200).json(userInfo);
   } catch (error) {
     res.status(500).json({
       code: 500,

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  service:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    command: ["tail", "-f", "/dev/null"]
+
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: xiaohangproject
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db:/var/lib/mysql
+
+volumes:
+  db: {}

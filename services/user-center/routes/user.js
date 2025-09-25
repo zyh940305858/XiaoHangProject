@@ -95,11 +95,7 @@ router.get('/', authJWT, authorizeRoles('admin', 'superadmin'), async (req, res)
       parseInt(pageSize)
     );
     
-    res.status(200).json({
-      code: 200,
-      message: '获取成功',
-      data: result
-    });
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({
       code: 500,
@@ -342,11 +338,7 @@ router.get('/:id', authJWT, authorizeRoles('admin', 'superadmin'), async (req, r
 
     const userInfo = await UserModel.getUserInfo(userId);
 
-    res.status(200).json({
-      code: 200,
-      message: '获取成功',
-      data: userInfo
-    });
+    res.status(200).json(userInfo);
   } catch (error) {
     if (error.message === '用户不存在') {
       return res.status(404).json({
@@ -430,11 +422,7 @@ router.put('/me', authJWT, async (req, res) => {
 
     const updatedUser = await UserModel.updateUser(req.user.id, updateData);
 
-    res.status(200).json({
-      code: 200,
-      message: '更新成功',
-      data: updatedUser
-    });
+    res.status(200).json(updatedUser);
   } catch (error) {
     res.status(400).json({
       code: 400,
@@ -525,8 +513,10 @@ router.put('/:id', authJWT, authorizeRoles('admin', 'superadmin'), async (req, r
     }
 
     // 构建更新数据
-    const { nickname, avatar, role, status, disabledRemark } = req.body;
+    const { username, email, nickname, avatar, role, status, disabledRemark } = req.body;
     const updateData = {};
+    if (username !== undefined) updateData.username = username;
+    if (email !== undefined) updateData.email = email;
     if (nickname !== undefined) updateData.nickname = nickname;
     if (avatar !== undefined) updateData.avatar = avatar;
     if (role !== undefined) updateData.role = role;
@@ -560,11 +550,7 @@ router.put('/:id', authJWT, authorizeRoles('admin', 'superadmin'), async (req, r
 
     const updatedUser = await UserModel.updateUser(userId, updateData);
 
-    res.status(200).json({
-      code: 200,
-      message: '更新成功',
-      data: updatedUser
-    });
+    res.status(200).json(updatedUser);
   } catch (error) {
     if (error.message === '用户不存在') {
       return res.status(404).json({
